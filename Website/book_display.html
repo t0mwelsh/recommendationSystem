@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="js/jquery-3.7.0.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <style>
+        .grid-container {
+            display: grid;
+            grid-template-columns: auto auto auto;
+            padding: 10px;
+        }
+        .grid-item {
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="grid-container" id="grid-container">
+    <!-- Data will be inserted here -->
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: 'book_fetcher.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                const gridContainer = $('#grid-container');
+                $.each(data, function (index, item) {
+                    const gridItem = $('<div class="grid-item"></div>');
+                    const image = $('<img>');
+                    image.attr('src', item.image_url);
+                    image.attr('alt', item.name);
+                    image.css({'width': '100px', 'height': '100px'});
+                    const name = $('<p></p>').html('<b>Name:</b> ' + item.name);
+                    const author = $('<p></p>').html('<b>Author:</b> ' + item.author);
+                    gridItem.append(image, name, author);
+                    gridContainer.append(gridItem);
+                });
+            },
+            error: function (error) {
+                console.error('Error:', error);
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

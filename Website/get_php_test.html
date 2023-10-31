@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Display JSON Data</title>
+</head>
+<body>
+
+<h2>JSON Data from PHP</h2>
+<div id="data"></div>
+
+<script>
+    fetch('book_fetcher.php')
+        .then(response => response.json())
+        .then(data => {
+            const dataContainer = document.getElementById('data');
+            data.forEach(item => {
+                const paragraph = document.createElement('p');
+                paragraph.textContent = `Item Name: ${item.item_name}, Author: ${item.item_author}`;
+                dataContainer.appendChild(paragraph);
+            });
+        })
+        .catch(error => console.error('Error:', error));
+</script>
+
+</body>
+</html>
