@@ -1,63 +1,30 @@
-<html>
-  <head>
-    <title>Book Fetcher</title>
-  </head>
-  <body>
-    <?php
-    // Allow cross-origin requests
-    /*header("Access-Control-Allow-Origin: http://localhost");
-    header("Content-Type: application/json; charset=UTF-8");
-    header("Access-Control-Allow-Methods: GET");
-    header("Access-Control-Max-Age: 3600");
-    header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+<?php
 
-    // Check if the request contains the API key
-    $providedKey = $_GET['api_key']; // You can change this to the appropriate parameter name
+$servername = "surus.db.elephantsql.com";
+$database = "nwgmoppd";
+$username = "nwgmoppd";
+$password = "1vzJoB2_ik_sIHGW9rsyUZA5XAS4cO9l";
 
-    // Replace 'YOUR_API_KEY' with your actual API key
-    $validKey = '09ff24b0-fdcf-4f6e-9beb-7cbef70a49cf';
+try {
+    $pdo = new PDO("pgsql:host=$servername;dbname=$database", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Verify the API key
-    if ($providedKey !== $validKey) {
-        header('HTTP/1.0 401 Unauthorized');
-        echo 'Unauthorized';
-        exit;
-    }*/
+    $stmt = $pdo->prepare('SELECT item_name, item_author, image_url FROM books');
+    $stmt->execute();
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Database connection parameters
-    $servername = " surus.db.elephantsql.com";
-    $username = "nwgmoppd";
-    $password = "1vzJoB2_ik_sIHGW9rsyUZA5XAS4cO9l";
-    $dbname = "nwgmoppd";
-
-    // Create connection
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    // SQL query to fetch data
-    $sql = "SELECT item_name, item_author, image_url FROM books";
-    $result = $conn->query($sql);
-
-    // Fetch data as associative array
-    $data = array();
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
+    // Handle null values
+    foreach ($data as &$row) {
+        foreach ($row as $key => $value) {
+            if ($value === null) {
+                $row[$key] = ''; // Replace null with an empty string
+            }
         }
     }
 
-    // Close the connection
-    $conn->close();
-
-    // Set the content type to JSON
     header('Content-Type: application/json');
-
-    // Output the JSON data
     echo json_encode($data);
-    ?>
-  </body>
-</html>
+} catch (PDOException $e) {
+    echo "Connection failed: " . $e->getMessage();
+}
+?>
